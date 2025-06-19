@@ -94,4 +94,4 @@ Make sure to access it via your NAS's IP address on your network!
 2.  On any computer, phone, or tablet on the **same local network**, open a web browser.
 3.  Navigate to `http://<YOUR_NAS_IP>:3000` (for example, `http://192.168.1.50:3000`).
 
-Your tier list application should now be fully functional.
+Your tier list application should now be fully functional. Currently it is set up as a movie tier list maker, just change the HTML and you can make it whatever you would like to (:
