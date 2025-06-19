@@ -28,8 +28,8 @@ body {
 /* NEW: Wrapper for each item to contain arrows */
 .tier-item-wrapper {
     position: relative;
-    width: 300px;
-    height: 300px;
+    width: 150px;
+    height: 150px;
     cursor: grab;
 }
 .tier-item-wrapper:active {
