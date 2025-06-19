@@ -160,7 +160,6 @@ CMD [ "node", "server.js" ]
 In the same `tier-list-app` directory, create a file named `docker-compose.yml`. This file tells Docker how to run your application and connect the folders for persistent storage.
 
 ```yaml
-version: '3.8'
 services:
   tier-list-app:
     build: .
