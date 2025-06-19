@@ -2,7 +2,13 @@
 
 This guide explains how to set up and run the Tier List Maker application on a Debian-based system, such as OpenMediaVault. This setup uses a Node.js backend to handle image uploads and save the tier list state, removing browser storage limitations.
 
+The guide is split into two sections:
+1.  **Manual Setup:** For running the application directly with Node.js.
+2.  **Docker Setup (Recommended):** For running the application as a persistent service that starts automatically with your NAS.
+
 ---
+
+## **Part 1: Manual Setup**
 
 ### **Step 1: Create the Folder Structure**
 
@@ -84,8 +90,6 @@ Tier List server running at http://localhost:3000
 Make sure to access it via your NAS's IP address on your network!
 ```
 
-**Note:** The server will keep running as long as your SSH session is active. For a permanent solution, you might want to look into running the Node.js script as a service using a process manager like `pm2`.
-
 ---
 
 ### **Step 5: Access Your Tier List**
@@ -94,4 +98,90 @@ Make sure to access it via your NAS's IP address on your network!
 2.  On any computer, phone, or tablet on the **same local network**, open a web browser.
 3.  Navigate to `http://<YOUR_NAS_IP>:3000` (for example, `http://192.168.1.50:3000`).
 
-Your tier list application should now be fully functional. Currently it is set up as a movie tier list maker, just change the HTML and you can make it whatever you would like to (:
+Your tier list application should now be fully functional.
+
+---
+---
+
+## **Part 2: Docker Setup (Recommended)**
+
+This method automates the setup and ensures your application always runs in the background. It assumes you have already completed **Step 1** and **Step 2** from the manual setup.
+
+### **Step 1: Install Docker**
+
+If you don't already have Docker on your system, you can install it from the command line.
+
+```bash
+# Install Docker
+curl -sSL [https://get.docker.com](https://get.docker.com) | sh
+
+# Add the current user to the docker group to run docker without sudo
+sudo usermod -aG docker $USER
+
+# Log out and log back in for the group changes to take effect
+```
+
+You will also need Docker Compose.
+
+```bash
+# Install Docker Compose
+sudo apt-get install docker-compose-plugin -y
+```
+
+### **Step 2: Create the `Dockerfile`**
+
+In your main `tier-list-app` directory, create a file named `Dockerfile` (with no file extension) and add the following content. This file defines how to build your application's image.
+
+```Dockerfile
+# Use an official Node.js runtime as a base image
+FROM node:18-slim
+
+# Set the working directory in the container
+WORKDIR /usr/src/app
+
+# Copy package.json and package-lock.json to the working directory
+COPY package*.json ./
+
+# Install application dependencies
+RUN npm install
+
+# Copy the rest of your application's code to the working directory
+COPY . .
+
+# Your app binds to port 3000, so expose it
+EXPOSE 3000
+
+# Define the command to run your app
+CMD [ "node", "server.js" ]
+```
+
+### **Step 3: Create the `docker-compose.yml` file**
+
+In the same `tier-list-app` directory, create a file named `docker-compose.yml`. This file tells Docker how to run your application and connect the folders for persistent storage.
+
+```yaml
+version: '3.8'
+services:
+  tier-list-app:
+    build: .
+    container_name: tier-list-maker
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./public/images:/usr/src/app/public/images
+      - ./data:/usr/src/app/data
+    restart: unless-stopped
+```
+
+### **Step 4: Build and Run the Application**
+
+With the `Dockerfile` and `docker-compose.yml` files created, you can now start your application with a single command. Make sure you are in the `tier-list-app` directory.
+
+```bash
+# Build the image and start the container in the background
+docker-compose up --build -d
+```
+
+Docker will now download the Node.js image, build your application, and start it. The `-d` flag runs it in "detached" mode, so it will continue running even if you close your SSH session. The `restart: unless-stopped` policy ensures it will automatically start when your NAS boots up.
+
+You can now access your tier list just as before, by navigating to `http://<YOUR_NAS_IP>:3000`.
