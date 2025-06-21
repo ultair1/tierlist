@@ -1,4 +1,3 @@
-/* Custom styles for the tier list maker */
 body {
     font-family: 'Inter', sans-serif;
     background-color: #1f2937; /* bg-gray-800 */
@@ -7,77 +6,134 @@ body {
 .tier-row {
     min-height: 100px;
     transition: background-color 0.2s ease-in-out;
+    border-radius: 0;
 }
 .tier-label {
-    width: 80px;
+    width: 100;
+    height: auto;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    border-top-left-radius: 1rem; /* 16px */
+    border-bottom-left-radius: 1rem; /* 16px */
 }
-.image-container, #image-pool {
+.image-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem; /* 8px */
-    padding: 0.5rem; /* 8px */
+    gap: 0.5rem;
+    padding: 0.5rem;
     flex-grow: 1;
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
 }
 
-/* NEW: Wrapper for each item to contain arrows */
+/* Wrapper for each item to contain arrows */
 .tier-item-wrapper {
     position: relative;
-    width: 150px;
-    height: 150px;
+    width: 130px;
+    height: 200px;
     cursor: grab;
+    border: 3px solid transparent; /* Placeholder for selection border */
+    border-radius: 8px;
+    transition: border-color 0.2s ease-in-out;
 }
 .tier-item-wrapper:active {
     cursor: grabbing;
 }
+/* NEW: Style for selected item */
+.tier-item-wrapper.selected {
+    border-color: #6366f1;
+}
+
 
 .tier-item {
     width: 100%;
     height: 100%;
-    border-radius: 0.375rem; /* rounded-md */
-    object-fit: contain;
-    /* The image itself is no longer the draggable element */
+    border-radius: 0.375rem;
+    object-fit: cover;
     pointer-events: none; 
 }
 
-/* NEW: Styles for the reorder arrows */
+/* Styles for the reorder arrows */
 .move-arrow {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
     background-color: rgba(0, 0, 0, 0.65);
     color: white;
     border: none;
     border-radius: 50%;
     width: 24px;
     height: 24px;
-    font-size: 18px;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     opacity: 0;
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.2s ease-in-out, background-color 0.2s ease;
     z-index: 10;
 }
-
-/* Show arrows on hover of the wrapper */
-.tier-item-wrapper:hover .move-arrow {
-    opacity: 1;
+.move-arrow:hover {
+    background-color: rgba(0, 0, 0, 0.9);
 }
 
+/* NEW: Styles for Vertical Arrows */
+.move-arrow.vertical {
+    left: 50%;
+    transform: translateX(-50%);
+    display: none; /* Hide by default, shown when item is selected */
+}
+.move-arrow.up {
+    top: 4px;
+}
+.move-arrow.down {
+    bottom: 4px;
+}
+
+/* NEW: Styles for Horizontal Arrows */
+.move-arrow.horizontal {
+    top: 50%;
+    transform: translateY(-50%);
+}
 .move-arrow.left {
     left: 4px;
 }
-
 .move-arrow.right {
     right: 4px;
+}
+
+/* NEW: Conditional visibility based on mode */
+/* In drag or both mode, show horizontal arrows on hover */
+body.mode-drag .tier-item-wrapper:hover .move-arrow.horizontal,
+body.mode-both .tier-item-wrapper:hover .move-arrow.horizontal {
+    opacity: 1;
+}
+/* In click or both mode, show vertical arrows when item is selected */
+body.mode-click .tier-item-wrapper.selected .move-arrow.vertical,
+body.mode-both .tier-item-wrapper.selected .move-arrow.vertical {
+    display: flex;
+    opacity: 1;
+}
+
+/* NEW: Interaction Mode Toggle Styles */
+.mode-btn {
+    padding: 8px 16px;
+    border: 2px solid #4f46e5;
+    color: #c7d2fe;
+    background-color: transparent;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+.mode-btn:hover {
+    background-color: #3730a3;
+    color: white;
+}
+.mode-btn.active {
+    background-color: #4f46e5;
+    color: white;
 }
 
 
@@ -88,12 +144,12 @@ body {
 }
 
 /* Tier Colors */
-.tier-s { background-color: #ef4444; } /* red-500 */
-.tier-a { background-color: #f97316; } /* orange-500 */
-.tier-b { background-color: #eab308; } /* yellow-500 */
-.tier-c { background-color: #22c55e; } /* green-500 */
-.tier-d { background-color: #3b82f6; } /* blue-500 */
-.tier-f { background-color: #6b7280; } /* gray-500 */
+.tier-s { background-color: gold; }
+.tier-a { background-color: green; }
+.tier-b { background-color: #05b41c; }
+.tier-c { background-color: #025c23; }
+.tier-d { background-color: #e9ae0e; }
+.tier-f { background-color: #d1c406; }
 
 /* Modal Styles */
 .modal {
@@ -102,7 +158,7 @@ body {
 
 /* Delete Zone Highlight */
 #delete-zone.drag-over {
-    background-color: rgba(239, 68, 68, 0.2); /* A dark red */
-    border-color: #ef4444; /* red-500 */
-    color: #fecaca; /* text-red-200 */
+    background-color: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+    color: #fecaca;
 }
